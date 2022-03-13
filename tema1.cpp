@@ -29,11 +29,20 @@ class Multime{
         void DisplaySet();
         void ChangeElement(int, int);
         void ReinitSet(int , int []);
+   // Metode tema bonus
+        int InSet(int);
+        int DisjointSets(Multime);
+        int* ReferenceToValue(int);
+        void SortingFunction(Multime&, char, void (*function)(Multime&, char));
 
     // Operatori
     friend Multime operator+ (Multime m1, Multime m2);
 	friend Multime operator- (Multime m1, Multime m2);
 	friend Multime operator* (Multime m1, Multime m2);
+    // Operatori tema bonus
+    friend int operator== (Multime m1, Multime m2);
+    friend int operator!= (Multime m1, Multime m2);
+    friend int operator! (Multime m1);
 
 	Multime& operator= (const Multime &multime)
 	{
@@ -47,10 +56,9 @@ class Multime{
 			v[i] = multime.v[i];
 		return *this;
 	}
-    
+
 	friend std::istream& operator>> (std::istream& in,  Multime& multime);
 	friend std::ostream& operator<< (std::ostream& out, const Multime& multime);
-
 };
 
 #pragma region Constr&Destr
@@ -459,7 +467,117 @@ Multime Intersection(Multime m1, Multime m2)
     return nullSet;
 }
 
+//Cerinte Bonus
 
+int Egalitate(Multime m1, Multime m2)
+{
+    bool ok = true;
+    if(m1.GetDimension() != m2.GetDimension())
+    {
+        return 0;
+    }
+    for(int i=0;i<m1.GetDimension() && ok == true;i++)
+    {
+        bool ok_aux = false;
+        for(int j=0;j<m2.GetDimension() && ok_aux == false;j++)
+        {
+            if(m1.GetSet()[i] == m2.GetSet()[j])
+            {
+                ok_aux = true;
+            }
+        }
+        if(ok_aux == false)
+        {
+            ok = false;
+        }
+    }
+    return ok;
+} 
+
+int VerificareVid(Multime m1)
+{
+    int x = m1.GetDimension();
+    if(x == 0)
+    {
+        return 1;
+    }
+    return 0;
+}
+
+int Multime::InSet(int value)
+{
+    for(int i=0;i<dimensiune;i++)
+    {
+        if(v[i] == value)
+            return 1;
+    }
+    return 0;
+}
+
+int Multime::DisjointSets(Multime m2)
+{
+    for(int i=0;i<dimensiune;i++)
+    {
+        for(int j=0;j<m2.GetDimension();j++)
+        {
+            if(v[i] == m2.GetSet()[j])
+            {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+int* Multime::ReferenceToValue(int position)
+{
+    if(position < 0 || position >= dimensiune)
+    {
+        return 0;
+    }
+    int *p = &v[position];
+    return p;
+}
+
+void sortare(Multime &m, char x)
+{
+    if(x == '<')
+    {
+        for(int i=0;i<m.GetDimension()-1;i++)
+        {
+            for(int j=i+1;j<m.GetDimension();j++)
+            {
+                if(m.GetSet()[i] > m.GetSet()[j])
+                {
+                    int aux = m.GetSet()[i];
+                    m.GetSet()[i] = m.GetSet()[j];
+                    m.GetSet()[j] = aux;
+                }
+            }
+        }
+    }
+    else{
+        for(int i=0;i<m.GetDimension()-1;i++)
+        {
+            for(int j=i+1;j<m.GetDimension();j++)
+            {
+                if(m.GetSet()[i] < m.GetSet()[j])
+                {
+                    int aux = m.GetSet()[i];
+                    m.GetSet()[i] = m.GetSet()[j];
+                    m.GetSet()[j] = aux;
+                }
+            }
+        }
+    }
+}
+
+void Multime::SortingFunction(Multime &m,char x, void (*sortare)(Multime&, char))
+{
+    sortare(m,x);
+}
+
+// Cerinte Bonus Final
 
 Multime* ReadSets(int &no_of_sets)
 {
@@ -677,6 +795,23 @@ Multime operator* (Multime m1, Multime m2)
 {
 	return Intersection(m1, m2);
 }
+// Cerinte Bonus
+int operator== (Multime m1, Multime m2)
+{
+    return Egalitate(m1, m2);
+}
+
+int operator!= (Multime m1, Multime m2)
+{
+    return !Egalitate(m1, m2);
+}
+
+int operator! (Multime m1)
+{
+    return VerificareVid(m1);
+}
+
+// Cerinte Bonus Final
 
 std::istream& operator>> (std::istream& in,  Multime& multime)
 {
@@ -707,29 +842,24 @@ std::ostream& operator<< (std::ostream& out, const Multime& multime)
 
 int main()
 {
-    Multime m3(2, 4);
-    cout<<m3;
-    // cout<<"Introdu Y pentru a incepe sau N pentru a iesi: ";
-    // char command;
-    // cin>>command;
-    // while(toupper(command) != 'Y')
-    // {
-    //     if(toupper(command) == 'N')
-    //     {
-    //         return 0;
-    //     }
-    //     else
-    //         cout<<"Comanda nevalida"<<endl;
-    //     cout<<"Introdu Y pentru a incepe sau N pentru a iesi: ";
-    //     cin>>command;
-    // }
 
-    // cout<<"Trebuie sa introduceti multimile dorile pentru a incepe"<<endl;
-    // Multime* multime;
-    // Read(multime);
-    // Menu(multime);
-
-
-
+    cout<<"Introdu Y pentru a incepe sau N pentru a iesi: ";
+    char command;
+    cin>>command;
+    while(toupper(command) != 'Y')
+    {
+        if(toupper(command) == 'N')
+        {
+            return 0;
+        }
+        else
+            cout<<"Comanda nevalida"<<endl;
+        cout<<"Introdu Y pentru a incepe sau N pentru a iesi: ";
+        cin>>command;
+    }
+    cout<<"Trebuie sa introduceti multimile dorile pentru a incepe"<<endl;
+    Multime* multime;
+    Read(multime);
+    Menu(multime);
     return 0;
 }
